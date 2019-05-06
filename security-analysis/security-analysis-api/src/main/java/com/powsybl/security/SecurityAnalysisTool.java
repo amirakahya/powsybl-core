@@ -124,9 +124,7 @@ public class SecurityAnalysisTool implements Tool {
                 options.addOption(Option.builder().longOpt(EXTERNAL)
                         .desc("external execution")
                         .build());
-                options.addOption(Option.builder().longOpt(SKIP_POSTPROC_OPTION)
-                        .desc("skip network importer post processors (when configured)")
-                        .build());
+                options.addOption(createSkipPostProcOption());
                 options.addOption(createImportParametersFileOption());
                 options.addOption(createImportParameterOption());
                 options.addOption(Option.builder().longOpt(OUTPUT_LOG_OPTION)
@@ -149,6 +147,10 @@ public class SecurityAnalysisTool implements Tool {
 
     protected TableFormatterConfig createTableFormatterConfig() {
         return TableFormatterConfig.load();
+    }
+
+    protected ImportConfig createImportConfig(CommandLine line) {
+        return ConversionToolUtils.createImportConfig(line);
     }
 
     private static Optional<String> getOptionValue(CommandLine line, String option) {
@@ -231,8 +233,7 @@ public class SecurityAnalysisTool implements Tool {
 
         context.getOutputStream().println("Loading network '" + caseFile + "'");
         Properties inputParams = readProperties(line, ConversionToolUtils.OptionType.IMPORT, context);
-        boolean skipPostProc = line.hasOption(SKIP_POSTPROC_OPTION);
-        ImportConfig importConfig = (!skipPostProc) ? ImportConfig.load() : new ImportConfig();
+        ImportConfig importConfig = createImportConfig(line);
         Network network = Importers.loadNetwork(caseFile, context.getShortTimeExecutionComputationManager(), importConfig, inputParams);
         network.getVariantManager().allowVariantMultiThreadAccess(true);
 

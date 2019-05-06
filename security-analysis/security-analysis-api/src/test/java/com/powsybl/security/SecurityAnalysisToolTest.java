@@ -6,24 +6,17 @@
  */
 package com.powsybl.security;
 
-import com.powsybl.commons.config.ComponentDefaultConfig;
-import com.powsybl.commons.config.MapModuleConfig;
-import com.powsybl.commons.datasource.DataSource;
-import com.powsybl.commons.datasource.ReadOnlyDataSource;
 import com.powsybl.commons.io.table.TableFormatterConfig;
 import com.powsybl.computation.ComputationManager;
 import com.powsybl.contingency.ContingenciesProviderFactory;
 import com.powsybl.iidm.import_.ImportConfig;
-import com.powsybl.iidm.import_.Importer;
-import com.powsybl.iidm.network.Network;
-import com.powsybl.iidm.network.VariantManager;
+import com.powsybl.iidm.tools.ConversionToolUtils;
 import com.powsybl.tools.AbstractToolTest;
 import com.powsybl.tools.Tool;
 import com.powsybl.tools.ToolRunningContext;
 import org.apache.commons.cli.CommandLine;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -40,17 +33,21 @@ import static org.mockito.Mockito.*;
 public class SecurityAnalysisToolTest extends AbstractToolTest {
 
     private SecurityAnalysisTool tool;
-    private MapModuleConfig moduleConfig;
-    private ComponentDefaultConfig config;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
         tool = new SecurityAnalysisTool() {
+
             @Override
             protected TableFormatterConfig createTableFormatterConfig() {
                 return new TableFormatterConfig();
+            }
+
+            @Override
+            protected ImportConfig createImportConfig(CommandLine line) {
+                return ConversionToolUtils.createImportConfig(line, new ImportConfig());
             }
         };
         Files.createFile(fileSystem.getPath("network.xml"));
@@ -105,7 +102,6 @@ public class SecurityAnalysisToolTest extends AbstractToolTest {
 
             when(context.getShortTimeExecutionComputationManager()).thenReturn(cm);
             when(context.getLongTimeExecutionComputationManager()).thenReturn(cm);
-            ImportConfig config = new ImportConfig();
 
             SecurityAnalysisFactory saFactory = new SecurityAnalysisMockFactory();
             SecurityAnalysis sa = saFactory.create(null, cm, 1);
@@ -121,39 +117,6 @@ public class SecurityAnalysisToolTest extends AbstractToolTest {
             // execute
             tool.run(cl, context, mock(ContingenciesProviderFactory.class), saFactory);
             verify(sa, times(1)).run(any(), any(), any());
-        }
-    }
-
-    private static class ImporterMock implements Importer {
-
-        static final String FORMAT = "net";
-
-        @Override
-        public String getFormat() {
-            return FORMAT;
-        }
-
-        @Override
-        public String getComment() {
-            return "";
-        }
-
-        @Override
-        public boolean exists(ReadOnlyDataSource dataSource) {
-            return true;
-        }
-
-        @Override
-        public Network importData(ReadOnlyDataSource dataSource, Properties parameters) {
-            Network network = Mockito.mock(Network.class);
-            VariantManager variantManager = Mockito.mock(VariantManager.class);
-            Mockito.when(variantManager.getWorkingVariantId()).thenReturn("s1");
-            Mockito.when(network.getVariantManager()).thenReturn(variantManager);
-            return network;
-        }
-
-        @Override
-        public void copy(ReadOnlyDataSource fromDataSource, DataSource toDataSource) {
         }
     }
 }
