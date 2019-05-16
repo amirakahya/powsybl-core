@@ -6,10 +6,13 @@
  */
 package com.powsybl.security.execution;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.io.ByteSource;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.security.LimitViolationType;
+import com.powsybl.security.SecurityAnalysisInput;
 import com.powsybl.security.SecurityAnalysisParameters;
+import com.powsybl.security.interceptors.SecurityAnalysisInterceptors;
 
 import java.util.*;
 
@@ -90,5 +93,15 @@ public class SecurityAnalysisExecutionInput {
     public SecurityAnalysisExecutionInput setNetworkVariant(Network network, String variantId) {
         networkVariant = new NetworkVariant(network, variantId);
         return this;
+    }
+
+    public void copyTo(SecurityAnalysisInput input) {
+        input.setParameters(parameters);
+        resultExtensions.stream()
+                .map(SecurityAnalysisInterceptors::createInterceptor)
+                .forEach(input::addInterceptor);
+        if (!violationTypes.isEmpty()) {
+            input.getFilter().setViolationTypes(ImmutableSet.copyOf(violationTypes));
+        }
     }
 }
