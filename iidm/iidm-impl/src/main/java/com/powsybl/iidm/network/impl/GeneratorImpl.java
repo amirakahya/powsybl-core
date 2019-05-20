@@ -153,6 +153,7 @@ class GeneratorImpl extends AbstractConnectable<Generator> implements Generator,
     @Override
     public GeneratorImpl setTargetP(double targetP) {
         ValidationUtil.checkActivePowerSetpoint(this, targetP);
+        ValidationUtil.checkActiveLimitsP(this, minP, maxP, targetP);
         double oldValue = this.targetP.set(getNetwork().getVariantIndex(), targetP);
         notifyUpdate("targetP", oldValue, targetP);
         return this;
@@ -167,6 +168,7 @@ class GeneratorImpl extends AbstractConnectable<Generator> implements Generator,
     public GeneratorImpl setTargetQ(double targetQ) {
         int variantIndex = getNetwork().getVariantIndex();
         ValidationUtil.checkVoltageControl(this, voltageRegulatorOn.get(variantIndex), targetV.get(variantIndex), targetQ);
+        ValidationUtil.checkReactiveLimitsQ(this, getReactiveLimits(), targetQ);
         double oldValue = this.targetQ.set(variantIndex, targetQ);
         notifyUpdate("targetQ", oldValue, targetQ);
         return this;

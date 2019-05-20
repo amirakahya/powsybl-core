@@ -73,6 +73,7 @@ public class BatteryImpl extends AbstractConnectable<Battery> implements Battery
     public Battery setP0(double p0) {
         int variantIndex = getNetwork().getVariantIndex();
         ValidationUtil.checkP0(this, p0);
+        ValidationUtil.checkActiveLimitsP(this, minP, maxP, p0);
         double oldValue = this.p0.set(variantIndex, p0);
         notifyUpdate("p0", oldValue, p0);
         return this;
@@ -93,6 +94,7 @@ public class BatteryImpl extends AbstractConnectable<Battery> implements Battery
     public Battery setQ0(double q0) {
         int variantIndex = getNetwork().getVariantIndex();
         ValidationUtil.checkQ0(this, q0);
+        ValidationUtil.checkReactiveLimitsQ(this, getReactiveLimits(), q0);
         double oldValue = this.q0.set(variantIndex, q0);
         notifyUpdate("q0", oldValue, q0);
         return this;

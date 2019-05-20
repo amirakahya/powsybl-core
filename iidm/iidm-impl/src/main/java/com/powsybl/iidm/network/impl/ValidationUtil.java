@@ -39,6 +39,34 @@ public final class ValidationUtil {
         }
     }
 
+    static void checkActiveLimitsP(Validable validable, double minP, double maxP, double p0) {
+        if (p0 > maxP) {
+            throw new ValidationException(validable, "invalid active power p0 > maxP : " + p0 + " > " + maxP);
+        }
+        if (p0 < minP) {
+            throw new ValidationException(validable, "invalid active power p0 < minP : " + p0 + " < " + minP);
+        }
+    }
+
+    static void checkReactiveLimitsQ(Validable validable, ReactiveLimits reactiveLimits, double q0) {
+        MinMaxReactiveLimits minMaxReactiveLimits;
+
+        if (reactiveLimits.getKind() == ReactiveLimitsKind.MIN_MAX) {
+            minMaxReactiveLimits = (MinMaxReactiveLimits) reactiveLimits;
+        } else {
+            // TODO what should be done for CURVE type
+//            throw new UnsupportedOperationException("Unsupported ReactiveLimits kind : " + reactiveLimits.getKind().name());
+            return;
+        }
+
+        if (q0 > minMaxReactiveLimits.getMaxQ()) {
+            throw new ValidationException(validable, "invalid reactive power q0 > maxQ : " + q0 + " > " + minMaxReactiveLimits.getMaxQ());
+        }
+        if (q0 < minMaxReactiveLimits.getMinQ()) {
+            throw new ValidationException(validable, "invalid reactive power q0 < minQ : " + q0 + " < " + minMaxReactiveLimits.getMinQ());
+        }
+    }
+
     static void checkVoltageControl(Validable validable, Boolean voltageRegulatorOn, double voltageSetpoint, double reactivePowerSetpoint) {
         if (voltageRegulatorOn == null) {
             throw new ValidationException(validable, "voltage regulator status is not set");

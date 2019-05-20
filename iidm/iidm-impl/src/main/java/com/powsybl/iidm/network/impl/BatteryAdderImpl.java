@@ -95,6 +95,7 @@ public class BatteryAdderImpl extends AbstractInjectionAdder<BatteryAdderImpl> i
         ValidationUtil.checkMinP(this, minP);
         ValidationUtil.checkMaxP(this, maxP);
         ValidationUtil.checkActiveLimits(this, minP, maxP);
+        ValidationUtil.checkActiveLimitsP(this, minP, maxP, p0);
 
         BatteryImpl battery = new BatteryImpl(getNetwork().getRef(), id, getName(), p0, q0, minP, maxP);
 

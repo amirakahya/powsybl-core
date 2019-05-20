@@ -105,7 +105,7 @@ public class GeneratorTest {
         thrown.expect(ValidationException.class);
         thrown.expectMessage("Invalid value of rated S");
         createGenerator("invalid", EnergySource.HYDRO, 20.0, 11., 0.0,
-                30.0, 40.0, false, 20.0);
+                15.0, 40.0, false, 20.0);
     }
 
     @Test
@@ -113,7 +113,7 @@ public class GeneratorTest {
         thrown.expect(ValidationException.class);
         thrown.expectMessage("Invalid value of rated S");
         createGenerator("invalid", EnergySource.HYDRO, 20.0, 11., -1.0,
-                30.0, 40.0, false, 20.0);
+                15.0, 40.0, false, 20.0);
     }
 
     @Test
@@ -143,11 +143,11 @@ public class GeneratorTest {
     @Test
     public void duplicateEquipment() {
         createGenerator("duplicate", EnergySource.HYDRO, 20.0, 11., 2.0,
-                30.0, 40.0, true, 2.0);
+                15.0, 40.0, true, 2.0);
         thrown.expect(PowsyblException.class);
         thrown.expectMessage("contains an object 'GeneratorImpl' with the id 'duplicate'");
         createGenerator("duplicate", EnergySource.HYDRO, 20.0, 11., 2.0,
-                30.0, 40.0, true, 2.0);
+                15.0, 40.0, true, 2.0);
     }
 
     @Test
@@ -188,7 +188,7 @@ public class GeneratorTest {
     @Test
     public void testRemove() {
         createGenerator("toRemove", EnergySource.HYDRO, 20.0, 11., 2.0,
-                30.0, 40.0, true, 2.0);
+                15.0, 40.0, true, 2.0);
         int count = network.getGeneratorCount();
         Generator generator = network.getGenerator("toRemove");
         assertNotNull(generator);
@@ -202,7 +202,7 @@ public class GeneratorTest {
     public void testSetterGetterInMultiVariants() {
         VariantManager variantManager = network.getVariantManager();
         createGenerator("testMultiVariant", EnergySource.HYDRO, 20.0, 11., 2.0,
-                30.0, 40.0, true, 2.0);
+                15.0, 40.0, true, 2.0);
         Generator generator = network.getGenerator("testMultiVariant");
         List<String> variantsToAdd = Arrays.asList("s1", "s2", "s3", "s4");
         variantManager.cloneVariant(VariantManagerConstants.INITIAL_VARIANT_ID, variantsToAdd);
@@ -210,12 +210,12 @@ public class GeneratorTest {
         variantManager.setWorkingVariant("s4");
         // check values cloned by extend
         assertTrue(generator.isVoltageRegulatorOn());
-        assertEquals(30.0, generator.getTargetP(), 0.0);
+        assertEquals(15.0, generator.getTargetP(), 0.0);
         assertEquals(40.0, generator.getTargetQ(), 0.0);
         assertEquals(2.0, generator.getTargetV(), 0.0);
         // change values in s4
         generator.setVoltageRegulatorOn(false);
-        generator.setTargetP(9.1);
+        generator.setTargetP(12.1);
         generator.setTargetQ(9.2);
         generator.setTargetV(9.3);
 
@@ -226,14 +226,14 @@ public class GeneratorTest {
         variantManager.setWorkingVariant("s2b");
         // check values cloned by allocate
         assertFalse(generator.isVoltageRegulatorOn());
-        assertEquals(9.1, generator.getTargetP(), 0.0);
+        assertEquals(12.1, generator.getTargetP(), 0.0);
         assertEquals(9.2, generator.getTargetQ(), 0.0);
         assertEquals(9.3, generator.getTargetV(), 0.0);
 
         // recheck initial variant value
         variantManager.setWorkingVariant(VariantManagerConstants.INITIAL_VARIANT_ID);
         assertTrue(generator.isVoltageRegulatorOn());
-        assertEquals(30.0, generator.getTargetP(), 0.0);
+        assertEquals(15.0, generator.getTargetP(), 0.0);
         assertEquals(40.0, generator.getTargetQ(), 0.0);
         assertEquals(2.0, generator.getTargetV(), 0.0);
 
